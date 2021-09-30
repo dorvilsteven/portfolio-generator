@@ -10,12 +10,34 @@ const inquirer = require('inquirer');
 //   console.log('Portfolio complete! Check out index.html to see the output!');
 // });
 
-const promptProject = () => {
-  console.log(`
-=================
-Add a New Project
-=================
-`);
+const promptUser = () => {
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'name',
+      message: 'What is your name?'
+    },
+    {
+      type: 'input',
+      name: 'github',
+      message: 'Enter your GitHub Username'
+    },
+    {
+      type: 'input',
+      name: 'about',
+      message: 'Provide some information about yourself:'
+    }
+  ]);
+};
+
+const promptProject = portfolioData => {
+  // If there's no 'projects' array property, create one
+  if (!portfolioData.projects) {
+    portfolioData.projects = [];
+  }
+  console.log(
+    `=================\nAdd a New Project\n=================`
+  );
   return inquirer.prompt([
     {
       type: 'input',
@@ -50,7 +72,16 @@ Add a New Project
       message: 'Would you like to enter another project?',
       default: false
     }
-  ]);
+  ]).then(projectData => {
+    portfolioData.projects.push(projectData);
+    if (projectData.confirmAddProject) {
+      return promptProject(portfolioData);
+    } else {
+      return portfolioData;
+    }
+  });
 };
 
-promptProject().then(answers => console.log(answers));
+promptUser()
+  .then(promptProject)
+  .then(portfolioData => console.log(portfolioData));
